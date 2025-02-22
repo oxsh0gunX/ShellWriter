@@ -6,8 +6,8 @@
 **step 2**
 **chmod +x shellwriter**  # Grant execute permission
 
-**step 3****
-sudo mv shellwriter /usr/local/bin**  # Move to a system-wide location
+**step 3**
+**sudo mv shellwriter /usr/local/bin**  # Move to a system-wide location
 
 all done you can use the tool now in anywhere in the system
 
