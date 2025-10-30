@@ -1,21 +1,22 @@
-#ShellWriter v2
+ShellWriter v2
 
 A simple script to quickly generate reverse shell payloads for CTFs.
 
 It saves you from manually editing IPs and ports. This version has new features like finding your tun0 IP and starting a listener for you.
 
-Installation
+**Installation**
 
-Make it executable:
+_Make it executable:
+_
+ 1) chmod +x shellwriter_v2.sh
 
-chmod +x shellwriter_v2.sh
 
+_Move it to your PATH (This lets you run shellwriter from any terminal) :_
 
-Move it to your PATH:
-(This lets you run shellwriter from any terminal)
+ 2) sudo mv shellwriter_v2.sh /usr/local/bin/shellwriter
 
-sudo mv shellwriter_v2.sh /usr/local/bin/shellwriter
-
+**ALL DONE :)
+******
 
 How to Use
 
