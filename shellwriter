@@ -35,7 +35,7 @@ validate_port() {
 
 # matte error sanam e
 show_help() {
-    echo -e "${YELLOW}📜 ShellWriter - A simple Bash tool by CyberShogun${RESET}"
+    echo -e "${YELLOW}📜 ShellWriter - A simple Bash tool by oxsh0gunX${RESET}"
 echo ""
      echo " "
 
