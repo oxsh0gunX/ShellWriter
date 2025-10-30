@@ -1,87 +1,53 @@
-ShellWriter v2
+#ShellWriter v2
 
-A simple and fast reverse shell generator that automates the process of selecting and modifying reverse shell payloads. Instead of manually copying from PentesterMonkey and editing IP and port details, ShellWriter does it for you in seconds.
+A simple script to quickly generate reverse shell payloads for CTFs.
 
-This version includes command-line flags, an automatic tun0 IP finder, and a built-in netcat listener.
+It saves you from manually editing IPs and ports. This version has new features like finding your tun0 IP and starting a listener for you.
 
 Installation
 
-Clone/Download:
-Get the shellwriter_v2.sh file onto your system.
-
-Make it Executable:
+Make it executable:
 
 chmod +x shellwriter_v2.sh
 
 
-Move to your PATH (Recommended):
-This lets you run the tool from anywhere. We'll rename it to just shellwriter for convenience.
+Move it to your PATH:
+(This lets you run shellwriter from any terminal)
 
 sudo mv shellwriter_v2.sh /usr/local/bin/shellwriter
 
 
-All Done!
-You can now use the tool from anywhere by typing shellwriter.
+How to Use
 
-Usage
-
-ShellWriter v2 can be run with flags or interactively.
-
-shellwriter [OPTIONS]
-
+Run the tool with flags.
 
 Options
 
--i <IP>: Specify the LHOST (Listening IP).
+-i <IP>: Your listening IP
 
--p <PORT>: Specify the LPORT (Listening Port).
+-p <PORT>: Your listening port
 
--t: Automatically use the IP address from your tun0 interface (for CTFs/VPNs).
+-t: (Easy Mode) Automatically use your tun0 IP
 
--l: Automatically start a netcat listener on the specified IP and port after generating the payload.
+-l: (Easy Mode) Automatically start a netcat listener
 
--h: Show the help message.
+-h: Show help
 
 Examples
 
-1. Standard Use (Manual IP & Port)
-This will validate the IP/Port and then show the payload menu.
-
-shellwriter -i 10.10.14.5 -p 4444
-
-
-2. CTF Mode (Auto tun0 IP & Start Listener)
-This is the fastest way. It automatically finds your tun0 IP, asks for a port, generates the payload, and then starts the listener.
+1. CTF Mode (Fastest Way)
+Uses your tun0 IP and starts a listener on port 9001.
 
 shellwriter -t -p 9001 -l
 
 
+2. Manual Mode
+Specify your IP and port.
+
+shellwriter -i {ip} -p 4444
+
+
 3. Interactive Mode
-Just run the command with no arguments. It will prompt you to enter the LHOST and LPORT.
+If you run shellwriter with no flags, it will ask you for the IP and port.
 
-shellwriter
-
-
-Available Payloads
-
-Bash
-
-Python 2
-
-Python 3
-
-Netcat (Traditional)
-
-Perl
-
-PHP (Exec)
-
-Ruby
-
-Java
-
-PowerShell
-
-Simple PHP File Uploader
-
-Disclaimer: This tool is intended for educational purposes and authorized security testing (like CTFs) only. Using it on systems without explicit permission is illegal and unethical.
+Disclaimer: This tool is for educational use and authorized testing (like CTFs) only.
