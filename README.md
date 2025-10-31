@@ -13,7 +13,7 @@ _
 
 _Move it to your PATH (This lets you run shellwriter from any terminal) :_
 
- 2) sudo mv shellwriter_v2.sh /usr/local/bin/shellwriter
+ 2) sudo mv shellwriter_v2.sh /usr/local/bin/shellwriter   OR /usr/bin
 
 **ALL DONE :)
 ******
