@@ -52,3 +52,4 @@ shellwriter -i {ip} -p 4444
 If you run shellwriter with no flags, it will ask you for the IP and port.
 
 Disclaimer: This tool is for educational use and authorized testing (like CTFs) only.
+enjoy
