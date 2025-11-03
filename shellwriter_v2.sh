@@ -311,7 +311,9 @@ echo -e "${YELLOW}$payload${RESET}"
 
 if [[ $choice == "u" ]]; then
     echo "$payload" > uploader.php
-    echo -e "${GREEN}📂 File saved as: uploader.php${RESET}"
+	    echo "$payload" > uploader.php5
+
+    echo -e "${GREEN}📂 File saved as: uploader.php and uploader.php5${RESET}"
 fi
 
 if [ "$START_LISTENER" = true ]; then
